@@ -1,3 +1,4 @@
 [tools]
 go = "1.25.12"
 golangci-lint = "2.14.0"
+upx = "5.2.1"
