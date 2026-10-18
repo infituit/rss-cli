@@ -12,7 +12,7 @@ import (
 
 func TestFreshRSSFeverAuthCheck(t *testing.T) {
 	instance := support.RequireFreshRSS(t)
-	client, err := freshrss.NewClient(freshrss.Config{
+	handler, err := freshrss.NewHandler(freshrss.Config{
 		BaseURL:     instance.BaseURL,
 		Username:    instance.Username,
 		APIPassword: instance.APIPassword,
@@ -20,11 +20,11 @@ func TestFreshRSSFeverAuthCheck(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	response, err := client.AuthCheck(context.Background())
+	response, err := handler.AuthCheck(context.Background())
 	if err != nil {
 		t.Fatal(err)
 	}
-	if response.Auth != 1 {
+	if !response.Authenticated {
 		t.Fatalf("auth = %d, want 1", response.Auth)
 	}
 }

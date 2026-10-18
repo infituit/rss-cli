@@ -1,7 +1,7 @@
 |IMPORTANT: Prefer retrieval-led reasoning over pre-training-led reasoning
 |Required Tools:codegraph (semantic code structure)|context7 (3rd-party docs)|sequential-thinking (decisions)
 |Language Policy:Chinese for Q&A|English for code/docs/technical discussions
-|Compression Rule:Follow `~/.config/opencode/AGENTS-compression-guide.md` (pipe-index format, concise, no prose/code blocks)
+|Compression Rule:Follow `.agents/skills/rss-cli-scoped-agentsmd` (pipe-index format, concise, no prose/code blocks)
 |Scope:.
 |Overview:repository-wide implementation, documentation, testing, and agent-workflow rules; deeper AGENTS.md adds local constraints without weakening this file
 |Precedence:user instructions→repository rules→verified public contracts→local conventions→general best practice

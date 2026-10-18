@@ -4,16 +4,12 @@ import (
 	"context"
 	"crypto/md5"
 	"encoding/hex"
-	"encoding/json"
 	"fmt"
-	"net/http"
 	"net/url"
 	"strings"
-)
 
-type HTTPClient interface {
-	Do(req *http.Request) (*http.Response, error)
-}
+	"github.com/infituit/rss-cli/pkg/rest/client"
+)
 
 type Config struct {
 	BaseURL     string
@@ -22,19 +18,24 @@ type Config struct {
 	APIKey      string
 }
 
-type Client struct {
+type cli struct {
 	endpoint   string
 	apiKey     string
-	httpClient HTTPClient
+	restClient client.IClient
 }
 
-type AuthResponse struct {
+type authCheckRequest struct {
+	API    string `query:"api"`
+	APIKey string `form:"api_key"`
+}
+
+type authCheckResponse struct {
 	APIVersion          int    `json:"api_version"`
 	Auth                int    `json:"auth"`
 	LastRefreshedOnTime string `json:"last_refreshed_on_time"`
 }
 
-func NewClient(cfg Config, httpClient HTTPClient) (*Client, error) {
+func newClient(cfg Config, httpClient client.HTTPClient) (*cli, error) {
 	if strings.TrimSpace(cfg.BaseURL) == "" {
 		return nil, fmt.Errorf("FreshRSS URL is required")
 	}
@@ -44,68 +45,44 @@ func NewClient(cfg Config, httpClient HTTPClient) (*Client, error) {
 		if strings.TrimSpace(cfg.Username) == "" || cfg.APIPassword == "" {
 			return nil, fmt.Errorf("fever API key or username and API password are required")
 		}
-		apiKey = APIKey(cfg.Username, cfg.APIPassword)
+		apiKey = apiKeyFromCredentials(cfg.Username, cfg.APIPassword)
 	}
 
 	endpoint, err := feverEndpoint(cfg.BaseURL)
 	if err != nil {
 		return nil, err
 	}
-	if httpClient == nil {
-		httpClient = http.DefaultClient
+	restClient, err := client.NewClient(&client.Capability{
+		Name:       providerName,
+		BaseURL:    endpoint,
+		HTTPClient: httpClient,
+	})
+	if err != nil {
+		return nil, err
 	}
 
-	return &Client{endpoint: endpoint, apiKey: apiKey, httpClient: httpClient}, nil
+	return &cli{endpoint: endpoint, apiKey: apiKey, restClient: restClient}, nil
 }
 
-func APIKey(username, apiPassword string) string {
-	sum := md5.Sum([]byte(username + ":" + apiPassword))
+func apiKeyFromCredentials(username, apiPassword string) string {
+	sum := md5.Sum([]byte(username + credentialSeparator + apiPassword))
 	return hex.EncodeToString(sum[:])
 }
 
-func (c *Client) AuthCheck(ctx context.Context) (AuthResponse, error) {
-	var auth AuthResponse
-	if err := c.post(ctx, nil, &auth); err != nil {
-		return AuthResponse{}, err
+func (c *cli) authCheck(ctx context.Context, req *authCheckRequest) (*authCheckResponse, error) {
+	if req == nil {
+		return nil, fmt.Errorf("fever auth check request is nil")
 	}
-	return auth, nil
-}
-
-func (c *Client) post(ctx context.Context, query url.Values, out any) error {
-	endpoint, err := url.Parse(c.endpoint)
-	if err != nil {
-		return err
+	response := new(authCheckResponse)
+	if err := c.restClient.Post().
+		WithContext(ctx).
+		WithQuery(req).
+		Form(req).
+		Do(ctx).
+		Into(response); err != nil {
+		return nil, fmt.Errorf("fever auth check failed: %w", err)
 	}
-	values := endpoint.Query()
-	values.Set("api", "")
-	for key, entries := range query {
-		for _, entry := range entries {
-			values.Add(key, entry)
-		}
-	}
-	endpoint.RawQuery = values.Encode()
-
-	form := url.Values{}
-	form.Set("api_key", c.apiKey)
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpoint.String(), strings.NewReader(form.Encode()))
-	if err != nil {
-		return err
-	}
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-
-	resp, err := c.httpClient.Do(req)
-	if err != nil {
-		return err
-	}
-	defer func() { _ = resp.Body.Close() }()
-
-	if resp.StatusCode < 200 || resp.StatusCode > 299 {
-		return fmt.Errorf("fever API returned HTTP %d", resp.StatusCode)
-	}
-	if err := json.NewDecoder(resp.Body).Decode(out); err != nil {
-		return fmt.Errorf("decode Fever API response: %w", err)
-	}
-	return nil
+	return response, nil
 }
 
 func feverEndpoint(rawURL string) (string, error) {
@@ -116,8 +93,8 @@ func feverEndpoint(rawURL string) (string, error) {
 	if parsed.Scheme == "" || parsed.Host == "" {
 		return "", fmt.Errorf("FreshRSS URL must include scheme and host")
 	}
-	if !strings.HasSuffix(parsed.Path, "/api/fever.php") {
-		parsed.Path = strings.TrimRight(parsed.Path, "/") + "/api/fever.php"
+	if !strings.HasSuffix(parsed.Path, feverAPIPath) {
+		parsed.Path = strings.TrimRight(parsed.Path, "/") + feverAPIPath
 	}
 	return parsed.String(), nil
 }

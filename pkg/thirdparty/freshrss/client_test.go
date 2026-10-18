@@ -8,16 +8,16 @@ import (
 	"testing"
 )
 
-func TestAPIKey(t *testing.T) {
-	got := APIKey("kevin", "freshrss")
+func TestAPIKeyFromCredentials(t *testing.T) {
+	got := apiKeyFromCredentials("kevin", "freshrss")
 	want := "4a6911fb47a87a77f4de285f4fac856d"
 	if got != want {
-		t.Fatalf("APIKey() = %q, want %q", got, want)
+		t.Fatalf("apiKeyFromCredentials() = %q, want %q", got, want)
 	}
 }
 
 func TestNewClientBuildsFreshRSSEndpoint(t *testing.T) {
-	client, err := NewClient(Config{BaseURL: "https://example.com", APIKey: "key"}, nil)
+	client, err := newClient(Config{BaseURL: "https://example.com", APIKey: "key"}, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -47,16 +47,15 @@ func TestAuthCheckPostsAPIKey(t *testing.T) {
 		}, nil
 	})
 
-	client, err := NewClient(Config{BaseURL: "https://example.com", APIKey: "key"}, httpClient)
+	handler, err := NewHandler(Config{BaseURL: "https://example.com", APIKey: "key"}, httpClient)
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	resp, err := client.AuthCheck(context.Background())
+	resp, err := handler.AuthCheck(context.Background())
 	if err != nil {
 		t.Fatal(err)
 	}
-	if resp.APIVersion != 3 || resp.Auth != 1 || resp.LastRefreshedOnTime != "1520013061" {
+	if resp.APIVersion != 3 || !resp.Authenticated || resp.LastRefreshedOnTime != "1520013061" {
 		t.Fatalf("unexpected response: %+v", resp)
 	}
 }
