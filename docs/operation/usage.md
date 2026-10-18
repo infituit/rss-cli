@@ -73,7 +73,7 @@ rss-cli --context home context show
 
 ```sh
 rss-cli freshrss config init --url https://freshrss.example.net
-printf '%s' 'api-password' | rss-cli freshrss auth set --user alice --api-password-stdin=true
+printf '%s' 'api-password' | rss-cli freshrss auth set --user alice --api-password-stdin
 rss-cli freshrss auth check
 rss-cli freshrss auth clear --confirm
 ```
