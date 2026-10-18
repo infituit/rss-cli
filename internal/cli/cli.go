@@ -23,6 +23,10 @@ type Options struct {
 }
 
 func Run(args []string, stdout, stderr io.Writer) error {
+	return RunContext(context.Background(), args, stdout, stderr)
+}
+
+func RunContext(ctx context.Context, args []string, stdout, stderr io.Writer) error {
 	opts, rest, err := parseGlobal(args)
 	if err != nil {
 		return err
@@ -41,7 +45,7 @@ func Run(args []string, stdout, stderr io.Writer) error {
 	case "context":
 		return runContext(rest[1:], opts, stdout)
 	case "freshrss":
-		return runFreshRSS(rest[1:], opts, stdout)
+		return runFreshRSS(ctx, rest[1:], opts, stdout)
 	default:
 		return fmt.Errorf("unknown command %q", rest[0])
 	}
@@ -158,7 +162,7 @@ func deleteContext(args []string) error {
 	return nil
 }
 
-func runFreshRSS(args []string, opts Options, stdout io.Writer) error {
+func runFreshRSS(ctx context.Context, args []string, opts Options, stdout io.Writer) error {
 	if len(args) == 0 || args[0] == "help" {
 		_, err := fmt.Fprintln(stdout, "freshrss commands: config, auth, capabilities")
 		return err
@@ -169,7 +173,7 @@ func runFreshRSS(args []string, opts Options, stdout io.Writer) error {
 	case "config":
 		return runFreshRSSConfig(args[1:], opts, stdout)
 	case "auth":
-		return runFreshRSSAuth(args[1:], opts, stdout)
+		return runFreshRSSAuth(ctx, args[1:], opts, stdout)
 	default:
 		return fmt.Errorf("unknown freshrss command %q", args[0])
 	}
@@ -234,7 +238,7 @@ func runFreshRSSConfig(args []string, opts Options, stdout io.Writer) error {
 		return fmt.Errorf("unknown freshrss config command %q", args[0])
 	}
 }
-func runFreshRSSAuth(args []string, opts Options, stdout io.Writer) error {
+func runFreshRSSAuth(ctx context.Context, args []string, opts Options, stdout io.Writer) error {
 	if len(args) == 0 || args[0] == "help" {
 		_, err := fmt.Fprintln(stdout, "freshrss auth commands: set, check, clear")
 		return err
@@ -289,15 +293,15 @@ func runFreshRSSAuth(args []string, opts Options, stdout io.Writer) error {
 		if err != nil {
 			return err
 		}
-		client, err := freshrss.NewClient(freshrss.Config{BaseURL: cfg.BaseURL, Username: values.Username, APIPassword: values.APIPassword, APIKey: values.APIKey}, http.DefaultClient)
+		handler, err := freshrss.NewHandler(freshrss.Config{BaseURL: cfg.BaseURL, Username: values.Username, APIPassword: values.APIPassword, APIKey: values.APIKey}, http.DefaultClient)
 		if err != nil {
 			return err
 		}
-		response, err := client.AuthCheck(context.Background())
+		response, err := handler.AuthCheck(ctx)
 		if err != nil {
 			return err
 		}
-		if response.Auth != 1 {
+		if !response.Authenticated {
 			return errors.New("authentication failed")
 		}
 		return output.Write(stdout, opts.Output, response)
