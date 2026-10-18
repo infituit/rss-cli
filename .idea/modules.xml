@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/freshrss-cli.iml" filepath="$PROJECT_DIR$/.idea/freshrss-cli.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/rss-cli.iml" filepath="$PROJECT_DIR$/.idea/rss-cli.iml" />
     </modules>
   </component>
 </project>
