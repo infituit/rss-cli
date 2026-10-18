@@ -9,6 +9,7 @@
 ## Operation
 
 - [使用与配置](operation/usage.md)：构建、context、FreshRSS 配置和命令输出。
+- [Release 源码包验证](operation/release_verification.md)：使用 GPG 公钥和 detached signature 验证源码包。
 
 ## Developer
 
