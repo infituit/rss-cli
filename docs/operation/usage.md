@@ -22,6 +22,15 @@ make build-matrix VERSION=v0.1.0-alpha.1 GOOS=linux GOARCH=arm64
 
 构建产物位于 `build/<VERSION>/`。`make build` 会注入版本、构建时间和 Git commit 信息。
 
+UPX 压缩默认关闭。启用后，构建完成会自动压缩产物：
+
+```sh
+make build VERSION=v0.1.0-alpha.1 UPX_ENABLED=1
+make platform-builds VERSION=v0.1.0-alpha.1 UPX_ENABLED=1 UPX_LEVEL=9
+```
+
+项目通过 `mise.toml` 固定 UPX 版本，启用压缩前运行 `mise install`。UPX 压缩支持 Linux `amd64`、`arm64` 和 Windows `amd64`；Darwin 以及 Windows `arm64` 会跳过压缩。缺少 `upx` 时构建会直接失败。
+
 ## 配置目录
 
 配置目录按以下优先级选择：
