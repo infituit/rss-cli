@@ -8,7 +8,7 @@
 |Where to look:配置:internal/config/config.go:XDG 路径、context/service YAML、current、严格字段校验
 |Where to look:凭据:internal/credential/store.go:AES-256-GCM、machine-id 派生、credentials.enc、权限
 |Where to look:输出:internal/output/output.go:JSON 默认、table、错误 envelope
-|Where to look:架构与契约:docs/developer/architecture.md|docs/operation/usage.md:职责、调用链、公开命令
+|Where to look:架构与契约:docs/developer/architecture/README.md|docs/operation/usage.md:职责、调用链、公开命令
 |Conventions:context 只管理环境和服务目录，不解析 provider 专属字段；service 配置与 credentials.enc 分离
 |Conventions:internal/cli 只依赖 provider Handler 和 pkg/types；provider 的 wire request/response 类型与协议细节不得进入命令层
 |Conventions:配置路径遵守 RSS_CLI_CONFIG_DIR→XDG_CONFIG_HOME/rss-cli→~/.config/rss-cli；未知 YAML 字段失败

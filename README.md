@@ -61,7 +61,7 @@ XDG_CONFIG_HOME/rss-cli
 - [文档导航](docs/README.md)
 - [项目目标与边界](docs/concepts/project-goals.md)
 - [使用与配置](docs/operation/usage.md)
-- [架构设计](docs/developer/architecture.md)
+- [架构设计](docs/developer/architecture/README.md)
 - [代码目录](docs/developer/code-structure.md)
 - [开发指南](docs/developer/development.md)
 - [FreshRSS Fever API 参考](docs/reference/fever-api.md)

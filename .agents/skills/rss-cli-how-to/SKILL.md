@@ -20,18 +20,18 @@ scoped `AGENTS.md` still own their contracts.
 
 ## Routing Rules
 
-| Task signal                                                                            | Load first                                                      | Add when needed                                                  |
-| -------------------------------------------------------------------------------------- | --------------------------------------------------------------- | ---------------------------------------------------------------- |
-| `cmd/**`, command tree, global flags, stdout/stderr, exit status                       | `cmd/AGENTS.md`                                                 | `rss-cli-audience-boundary` for user-facing docs                 |
-| `internal/cli`, context/service assembly, command behavior                             | `internal/AGENTS.md`                                            | `rss-cli-audience-boundary` for command docs                     |
-| config paths, context/service YAML, strict decoding, `current`                         | `internal/AGENTS.md`                                            | security/testing guidance for boundary changes                   |
-| credentials, encryption, permissions, redaction                                        | `internal/AGENTS.md`                                            | security guidance; stop on credential-boundary changes           |
-| `pkg/thirdparty/freshrss`, Fever HTTP/JSON, transport stubs                            | `pkg/AGENTS.md`                                                 | current official HTTP/Go docs when an unfamiliar API is involved |
-| `testsuite/support`, Docker Compose FreshRSS fixture, integration tag                  | `rss-cli-testsuite-support`                                     | generic testing guidance only for a concrete gap                 |
-| README, `docs/**`, Issue, PR, or artifact placement                                    | `rss-cli-audience-boundary`, `rss-cli-information-architecture` | `rss-cli-create-pr` for PR delivery                              |
-| scoped `AGENTS.md` creation or compression                                             | `rss-cli-scoped-agentsmd`                                       | nearest parent and child rules                                   |
-| PR preparation, creation, update, replacement, or split                                | `rss-cli-create-pr`                                             | affected surface skill and review guidance                       |
-| cross-layer change, public CLI/API/config contract, shared abstraction, trust boundary | nearest scoped rules first                                      | gather 2-3 local patterns; ask before an unapproved departure    |
+| Task signal                                                                                          | Load first                                                      | Add when needed                                                |
+| ---------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- | -------------------------------------------------------------- |
+| `cmd/**`, command tree, global flags, stdout/stderr, exit status                                     | `cmd/AGENTS.md`                                                 | `rss-cli-audience-boundary` for user-facing docs               |
+| `internal/cli`, context/service assembly, command behavior                                           | `internal/AGENTS.md`                                            | `rss-cli-audience-boundary` for command docs                   |
+| config paths, context/service YAML, strict decoding, `current`                                       | `internal/AGENTS.md`                                            | security/testing guidance for boundary changes                 |
+| credentials, encryption, permissions, redaction                                                      | `internal/AGENTS.md`                                            | security guidance; stop on credential-boundary changes         |
+| `pkg/thirdparty/freshrss`, Fever HTTP/JSON, transport stubs                                          | `pkg/thirdparty/AGENTS.md` then `rss-cli-thirdparty`            | `pkg/AGENTS.md`; current official HTTP/Go docs when unfamiliar |
+| `testsuite/support`, Docker Compose FreshRSS fixture, integration tag                                | `rss-cli-testsuite-support`                                     | generic testing guidance only for a concrete gap               |
+| README, `docs/**`, Issue, PR, or artifact placement                                                  | `rss-cli-audience-boundary`, `rss-cli-information-architecture` | `rss-cli-create-pr` for PR delivery                            |
+| scoped `AGENTS.md` creation or compression                                                           | `rss-cli-scoped-agentsmd`                                       | nearest parent and child rules                                 |
+| PR preparation, creation, update, replacement, or split                                              | `rss-cli-create-pr`                                             | affected surface skill and review guidance                     |
+| cross-layer placement, dependency direction, shared abstraction, public contract, architecture drift | `rss-cli-architecture-judgment`                                 | affected surface skill; ask before an unapproved departure     |
 
 ## Core Pattern
 
@@ -77,6 +77,8 @@ repository unless explicitly requested.
 ## Cross-References
 
 - `rss-cli-testsuite-support`: real FreshRSS fixture and integration boundary.
+- `rss-cli-architecture-judgment`: pre-flight/post-flight architecture judgment and boundary drift checks.
+- `rss-cli-thirdparty`: provider capabilities, raw API contracts, Handler/client separation, and shared client reuse.
 - `rss-cli-information-architecture`: durable artifact placement and sync.
 - `rss-cli-audience-boundary`: reader and artifact content limits.
 - `rss-cli-scoped-agentsmd`: subtree rule generation and compression.

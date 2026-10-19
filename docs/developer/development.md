@@ -48,7 +48,7 @@ make integration-test
 ## 新增服务能力
 
 1. 在 `pkg/types` 确认或新增稳定的应用请求/响应类型；不要把 provider JSON tag 和协议 envelope 泄漏到公共类型。
-2. 在 `pkg/thirdparty/<service>` 按 `Handler -> cli -> pkg/rest/client` 实现 provider；请求和响应 wire types 只在 provider 内部使用，并补齐双向转换与 transport stub 测试。
+2. 在 `pkg/thirdparty/<service>` 实现 provider；client 使用 `pkg/rest/client`，Handler 转换 `pkg/types`，请求和响应 wire types 只在 provider 内部使用，并补齐 transport stub 测试。
 3. 在 `internal/cli` 增加该服务顶层命令，只消费 Handler 和 `pkg/types`。
 4. 复用 `internal/config` 的 context/service 存储，不把 provider 字段放入 context 逻辑。
 5. 使用 `internal/output` 输出 JSON、table 和错误结果。

@@ -13,7 +13,7 @@
 
 ## Developer
 
-- [架构设计](developer/architecture.md)：代码职责、依赖方向和运行链路。
+- [架构设计](developer/architecture/README.md)：代码职责、依赖关系和 `pkg` 一级包边界。
 - [代码目录](developer/code-structure.md)：目录结构与放置规则。
 - [开发指南](developer/development.md)：测试、构建和新增服务能力。
 - [版本与构建规则](developer/versioning.md)：版本元数据和构建产物。
