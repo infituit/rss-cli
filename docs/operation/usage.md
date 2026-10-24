@@ -62,6 +62,18 @@ XDG_CONFIG_HOME=/tmp/config rss-cli context list
 
 配置文件使用严格 YAML 解析，未知字段会被拒绝。敏感认证只写入应用层加密的 `credentials.enc`。
 
+## Trace
+
+通过 CLI 配置当前 context 的 OTLP/HTTP endpoint，不使用 OTEL 环境变量：
+
+```sh
+rss-cli tracing config init --endpoint http://otel.r640.local/v1/traces
+rss-cli tracing config show
+rss-cli tracing config disable
+```
+
+启用配置后，CLI 会将 Trace 发送到当前 context 配置的 endpoint。未配置 tracing 或执行 `disable` 后不发送 Trace。
+
 ## Context
 
 ```sh

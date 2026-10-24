@@ -39,6 +39,7 @@ func NewRootCommand(ctx context.Context, stdout, stderr io.Writer) *cobra.Comman
 		NewVersionCommand(opts),
 		NewCapabilitiesCommand(opts),
 		NewContextCommand(opts),
+		NewTracingCommand(opts),
 		NewFreshRSSCommand(ctx, opts),
 	)
 
