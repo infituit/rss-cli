@@ -2,38 +2,44 @@ package telemetry
 
 import (
 	"context"
-	"os"
+	"fmt"
+	"net/url"
 	"time"
 
 	"github.com/infituit/rss-cli/pkg/version"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	"go.opentelemetry.io/otel/trace"
 )
 
 const (
-	serviceName                    = "rss-cli"
-	commandSpanName                = "rss-cli.command"
-	httpTracerName                 = "rss-cli.http"
-	shutdownTimeout                = 5 * time.Second
-	otelSDKDisabledEnv             = "OTEL_SDK_DISABLED"
-	otelExporterOTLPEndpoint       = "OTEL_EXPORTER_OTLP_ENDPOINT"
-	otelExporterOTLPTracesEndpoint = "OTEL_EXPORTER_OTLP_TRACES_ENDPOINT"
-	otelSDKDisabledValue           = "true"
-	serviceNameAttribute           = "service.name"
-	serviceVersionAttribute        = "service.version"
+	serviceName             = "rss-cli"
+	commandSpanName         = "rss-cli.command"
+	httpTracerName          = "rss-cli.http"
+	shutdownTimeout         = 5 * time.Second
+	serviceNameAttribute    = "service.name"
+	serviceVersionAttribute = "service.version"
 )
 
-// Setup configures OTLP tracing when an OTLP endpoint is present.
-func Setup(ctx context.Context) (func(context.Context) error, error) {
-	if os.Getenv(otelSDKDisabledEnv) == otelSDKDisabledValue ||
-		(os.Getenv(otelExporterOTLPEndpoint) == "" && os.Getenv(otelExporterOTLPTracesEndpoint) == "") {
+// Config controls OTLP tracing for a process.
+type Config struct {
+	Enabled  bool
+	Endpoint string
+}
+
+// Setup configures OTLP tracing from the selected context configuration.
+func Setup(ctx context.Context, cfg Config) (func(context.Context) error, error) {
+	if !cfg.Enabled {
 		return func(context.Context) error { return nil }, nil
 	}
-	exporter, err := otlptracegrpc.New(ctx)
+	endpoint, err := url.Parse(cfg.Endpoint)
+	if err != nil || endpoint.Host == "" || (endpoint.Scheme != "http" && endpoint.Scheme != "https") {
+		return nil, fmt.Errorf("invalid tracing endpoint %q", cfg.Endpoint)
+	}
+	exporter, err := otlptracehttp.New(ctx, otlptracehttp.WithEndpointURL(cfg.Endpoint))
 	if err != nil {
 		return nil, err
 	}

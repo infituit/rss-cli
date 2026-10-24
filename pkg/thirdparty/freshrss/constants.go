@@ -6,4 +6,8 @@ const (
 	feverAPIQueryValue  = ""
 	credentialSeparator = ":"
 	authenticatedValue  = 1
+	markItemValue       = "item"
+	markFeedValue       = "feed"
+	markGroupValue      = "group"
+	readValue           = "read"
 )

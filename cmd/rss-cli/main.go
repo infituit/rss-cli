@@ -5,12 +5,32 @@ import (
 	"os"
 
 	"github.com/infituit/rss-cli/internal/cli"
+	"github.com/infituit/rss-cli/internal/config"
 	"github.com/infituit/rss-cli/internal/output"
 	"github.com/infituit/rss-cli/internal/telemetry"
 )
 
 func main() {
-	shutdown, err := telemetry.Setup(context.Background())
+	tracingConfig := telemetry.Config{}
+	current, err := config.Current()
+	if err != nil {
+		_ = output.WriteError(os.Stderr, err)
+		os.Exit(1)
+	}
+	if current != "" {
+		contextConfig, loadErr := config.LoadContext(current)
+		if loadErr != nil {
+			_ = output.WriteError(os.Stderr, loadErr)
+			os.Exit(1)
+		}
+		if contextConfig.Tracing != nil {
+			tracingConfig = telemetry.Config{
+				Enabled:  contextConfig.Tracing.Enabled,
+				Endpoint: contextConfig.Tracing.Endpoint,
+			}
+		}
+	}
+	shutdown, err := telemetry.Setup(context.Background(), tracingConfig)
 	if err != nil {
 		_ = output.WriteError(os.Stderr, err)
 		os.Exit(1)

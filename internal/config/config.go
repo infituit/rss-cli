@@ -24,7 +24,13 @@ const (
 )
 
 type ContextConfig struct {
-	Version int `yaml:"version"`
+	Version int            `yaml:"version"`
+	Tracing *TracingConfig `yaml:"tracing,omitempty"`
+}
+
+type TracingConfig struct {
+	Enabled  bool   `yaml:"enabled"`
+	Endpoint string `yaml:"endpoint"`
 }
 
 type ServiceConfig struct {
@@ -136,6 +142,25 @@ func LoadContext(name string) (ContextConfig, error) {
 		return cfg, fmt.Errorf("unsupported context config version %d", cfg.Version)
 	}
 	return cfg, nil
+}
+
+func UpdateContext(name string, cfg ContextConfig) error {
+	if cfg.Version == 0 {
+		cfg.Version = CurrentConfigVersion
+	}
+	if cfg.Version != CurrentConfigVersion {
+		return fmt.Errorf("unsupported context config version %d", cfg.Version)
+	}
+	path, err := ContextConfigPath(name)
+	if err != nil {
+		return err
+	}
+	if _, err := os.Stat(path); errors.Is(err, os.ErrNotExist) {
+		return fmt.Errorf("context %q does not exist", name)
+	} else if err != nil {
+		return err
+	}
+	return writeYAML(path, cfg)
 }
 
 func SaveService(contextName, service string, cfg ServiceConfig, force bool) error {
