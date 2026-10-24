@@ -8,7 +8,7 @@ import (
 	"github.com/infituit/rss-cli/pkg/version"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	"go.opentelemetry.io/otel/trace"
@@ -33,7 +33,7 @@ func Setup(ctx context.Context) (func(context.Context) error, error) {
 		(os.Getenv(otelExporterOTLPEndpoint) == "" && os.Getenv(otelExporterOTLPTracesEndpoint) == "") {
 		return func(context.Context) error { return nil }, nil
 	}
-	exporter, err := otlptracegrpc.New(ctx)
+	exporter, err := otlptracehttp.New(ctx)
 	if err != nil {
 		return nil, err
 	}
